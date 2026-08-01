@@ -54,7 +54,12 @@ export function BeforeAfterSlider({
           stays visible even at 0%. */}
       {/* max-h matters as much as the ratio: at a ~1800px-wide container a 2/1
           box is ~900px tall and eats the whole viewport. */}
-      <div className="relative max-h-[460px] min-h-[300px] border border-hairline bg-paper-dim aspect-[4/3] sm:aspect-[16/7] lg:aspect-[24/7]">
+      {/* w-full is load-bearing: with an auto width, `min-h` and `aspect-ratio`
+          together resolve the WIDTH from the min-height (300px at 4/3 = 400px),
+          which overflowed the container on a ~390px phone and gave the whole
+          homepage a horizontal scrollbar. A definite width fixes the ratio's
+          input so min-h can only ever make the box taller. */}
+      <div className="relative aspect-[4/3] max-h-[460px] min-h-[300px] w-full border border-hairline bg-paper-dim sm:aspect-[16/7] lg:aspect-[24/7]">
         <div className="absolute inset-0 overflow-hidden">
           {/* BEFORE — underneath, always fully painted */}
           <PanelBody panel={before} tone="before" />
