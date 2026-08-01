@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ *  Theme variables
+ *  Semantic colors live on :root (dark = default) with a light override.
+ *  @theme maps Tailwind color utilities onto these vars, so bg-paper /
+ *  text-ink / etc. follow whichever theme is active on <html data-theme>.
+ * ------------------------------------------------------------------ */
+/* NOTE ON THEME SWITCHING — see lib/theme.ts.
+   These colors are unregistered custom properties. When data-theme flips, any
+   element with a `transition` on color/background-color freezes at its OLD
+   value and never lands on the new one (header links rendered dark-theme ink on
+   a light background). The fix injects a short-lived `transition:none` <style>
+   around every theme change. A class defined here would NOT work — Tailwind
+   doesn't emit it into the compiled sheet. Don't "simplify" it back to a class. */
+
+:root {
+  /* Dark (default) */
+  --paper: #0e0e0c;
+  --paper-dim: #181813;
+  --ink: #f3f0e7;
+  --ink-soft: #bdb9ad;
+  --muted: #837f73;
+  --accent: #a2dcae;
+  --accent-ink: #0e1a12;
+  --hairline: rgba(243, 240, 231, 0.13);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  /* Light */
+  --paper: #f6f4ee;
+  --paper-dim: #ece9df;
+  --ink: #1a1a17;
+  --ink-soft: #46453e;
+  --muted: #78746a;
+  /* Deep green as the accent on light grounds (a pastel would wash out);
+     accent-ink flips to light for text sitting on an accent fill. */
+  --accent: #2f6a46;
+  --accent-ink: #f4f7f0;
+  --hairline: rgba(26, 26, 20, 0.15);
+  color-scheme: light;
+}
+
+/* NOT `@theme inline` — inline resolves var()s at build time, which would let
+   Lightning CSS prune --paper and the data-theme overrides as "unused". Plain
+   @theme keeps --color-* referencing the live vars, so theming works. */
+@theme {
+  --color-paper: var(--paper);
+  --color-paper-dim: var(--paper-dim);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-hairline: var(--hairline);
+
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  --tracking-caps: 0.2em;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-feature-settings: "kern", "liga", "calt";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  background-color: var(--paper);
+  /* NB: do NOT transition background-color/color here. Those values come from
+     var(--paper)/var(--ink); a transition on a property fed by an unregistered
+     custom property freezes at the old value when the var changes on theme
+     switch (the whole page would stay dark). Theme switch is instant instead. */
+}
+
+/* Optical sizing for the variable serif — headlines get the display cut */
+.font-serif,
+h1,
+h2,
+h3 {
+  font-optical-sizing: auto;
+}
+
+/* Technical label ("kicker") — monospace, wide-tracked, uppercase */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Tabular figures so counting-up numbers don't reflow their box width */
+.tnum {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum", "lnum";
+}
+
+/* Focus ring — visible, on-brand, keyboard only */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Before/after slider: nudge the handle until the visitor grabs it, so the
+   drag affordance is obvious without a permanent "drag me" label. */
+@keyframes slider-nudge {
+  0%,
+  55%,
+  100% {
+    transform: translateX(0);
+  }
+  70% {
+    transform: translateX(9px);
+  }
+  85% {
+    transform: translateX(3px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .slider-nudge {
+    animation: slider-nudge 2.6s ease-in-out infinite;
+  }
+}
+
+/* Scroll fade-in: default hidden, revealed once via IntersectionObserver.
+   If JS is off or reduced-motion is on, content shows immediately. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}

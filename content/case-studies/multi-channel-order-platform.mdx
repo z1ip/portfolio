@@ -1,0 +1,119 @@
+---
+title: "Replacing ShipStation with a custom multi-channel order platform"
+client: "Confidential — multi-channel retailer"
+platform: "Shopify"
+platforms: ["Amazon", "Walmart", "Etsy", "Shopify", "TikTok Shop"]
+type: "Tooling"
+role: "Operations manager · co-built with one other developer"
+timeframe: "In production today"
+summary: "Unified five sales channels into one fulfillment queue and retired the subscription that sat between us and our own orders."
+metric:
+  value: 24000
+  prefix: "$"
+  label: "saved per year"
+featured: true
+order: 1
+---
+
+## The problem
+
+We were running five storefronts — Amazon, Walmart Marketplace, Etsy, Shopify,
+and TikTok Shop — through ShipStation plus a patchwork of spreadsheets and
+manual CSV exports. On paper it worked. In practice it cost us money and hours
+every single day.
+
+Orders landed in five different dashboards with five different data shapes.
+ShipStation's per-order pricing and add-on fees kept climbing as volume grew —
+and at roughly **5,000 orders a month**, per-order pricing is not a rounding
+error. Inventory drift between channels meant oversells and cancellations,
+which on Amazon and Walmart directly threaten your seller metrics.
+
+<StatGrid>
+  <CalloutStat value="5" label="disconnected dashboards" description="One per channel, none talking to each other." />
+  <CalloutStat value="~5,000" label="orders per month" description="Volume that makes per-order pricing genuinely expensive." />
+  <CalloutStat value="$2k/mo" label="in tooling & fees" description="Subscription tiers, add-ons, and overage charges." />
+</StatGrid>
+
+## The approach
+
+I'd been automating pieces of this for a while. The step change was deciding to
+replace the hub itself. Working with one other developer, I helped build a
+single order platform that ingests every channel through its native API,
+normalizes orders into one schema, and drives fulfillment from a unified queue.
+
+The design goal was boring on purpose: **one screen, one source of truth, zero
+CSV exports.** Everything else followed from that.
+
+<IntegrationsDiagram
+  hub="Multi-channel Order Platform"
+  hubNote="One normalized queue · PHP"
+  inputs={{
+    heading: "Sales channels",
+    items: ["Amazon API", "Walmart Marketplace API", "Etsy API", "Shopify API", "TikTok Shop API"],
+  }}
+  outputs={{
+    heading: "Fulfillment",
+    items: ["Unified order queue", "Label generation", "Shipment tracking", "Inventory sync"],
+  }}
+  caption="Orders flow in from every channel, are normalized once, and drive fulfillment from a single queue — no manual exports in between."
+/>
+
+Key decisions:
+
+- **Native APIs over a middleware tax.** Pulling directly from each channel's
+  API removed both the per-order fee and the sync lag that caused oversells.
+- **Built to fit the operation, not the average customer.** Off-the-shelf tools
+  are built for the median seller. Ours is built for our catalog, our channel
+  mix, and our shipping profile — which is why it's both cheaper and better at
+  the specific job.
+- **One inventory picture.** A shared availability number pushes back out to
+  the channels, so selling the last unit in one place decrements it everywhere.
+
+<BeforeAfter
+  before={{ label: "Before — 5 dashboards, CSV exports" }}
+  after={{ label: "After — one unified order queue" }}
+  caption="The daily fulfillment view went from five browser tabs and a spreadsheet to a single prioritized queue."
+/>
+
+## The result
+
+The platform replaced ShipStation and the manual work around it outright.
+
+<blockquote>
+The number I care about most isn't the $24k — it's that oversells effectively
+went to zero, which kept our Amazon and Walmart metrics clean.
+</blockquote>
+
+- **~$24,000 per year saved** in subscription, per-order, and add-on fees.
+- **Oversells effectively eliminated** via the shared inventory picture,
+  protecting seller metrics across marketplaces.
+- **99% on-time shipping** sustained at roughly 5,000 orders a month.
+- **One queue instead of five dashboards** — batch label generation replaced
+  tab-hopping and manual exports.
+
+It's the clearest example of how I work: when a tool stops fitting the
+operation, I'm comfortable helping build the one that does.
+
+## Stack
+
+<StackList
+  groups={[
+    {
+      title: "Application",
+      items: [
+        { name: "PHP", note: "Order ingest, normalization, and queue" },
+        { name: "Two-person build", note: "Co-built and maintained in-house" },
+      ],
+    },
+    {
+      title: "Channel APIs",
+      items: [
+        { name: "Amazon", note: "Orders, inventory, fulfillment" },
+        { name: "Walmart Marketplace", note: "Orders & shipping" },
+        { name: "Etsy", note: "Receipts & listings" },
+        { name: "Shopify", note: "Orders & inventory levels" },
+        { name: "TikTok Shop", note: "Orders & fulfillment" },
+      ],
+    },
+  ]}
+/>
