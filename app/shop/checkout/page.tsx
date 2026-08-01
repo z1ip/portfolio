@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Container } from "@/components/container";
 import { useCart } from "@/components/shop/cart-context";
 import type { Product } from "@/lib/shop";
+import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
 type Status = "idle" | "submitting" | "done";
@@ -50,7 +51,7 @@ export default function CheckoutPage() {
         ? `Estimated annual value: $${receiptValue.toLocaleString("en-US")}/yr\n\n`
         : "\n") +
       `Total: $0.00 (talk is cheap; the proof is above)\n\n` +
-      `Contact: ${"m.blakely3030@yahoo.com"} · 352-410-4999\n`;
+      `Contact: ${site.email} · ${site.phone}\n`;
     const blob = new Blob([body], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

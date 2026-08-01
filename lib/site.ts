@@ -10,7 +10,7 @@ export const site = {
   description:
     "E-commerce and marketplace operations manager with 7 years running Amazon, Walmart, Etsy, Shopify, and TikTok Shop stores end-to-end — listings, logistics, creative, and the internal tools that hold it together.",
   url: "https://michaeldblakely.com",
-  email: "m.blakely3030@yahoo.com",
+  email: "contact@michaeldblakely.com",
   phone: "352-410-4999",
   linkedin: "https://www.linkedin.com/in/michael-blakely-20a139223",
   location: "Dallas, GA — remote or open to relocation",
