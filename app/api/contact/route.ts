@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
-import { site } from "@/lib/site";
+import { inboxAddress, mailerConfigured, sendMail } from "@/lib/mailer";
 
-// Node runtime (default) — Resend SDK needs Node, not the edge runtime.
+// SMTP needs raw TCP, which the edge runtime doesn't have. Must stay nodejs.
 export const runtime = "nodejs";
 
 type Payload = {
@@ -51,8 +50,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  if (!mailerConfigured()) {
     // Not configured yet — tell the client to fall back to a mailto link.
     return NextResponse.json(
       { error: "The contact form isn't live yet. Please email me directly." },
@@ -60,35 +58,22 @@ export async function POST(request: Request) {
     );
   }
 
-  const resend = new Resend(apiKey);
-  // Defaults to Resend's shared test sender; override once the domain is
-  // verified in Resend (e.g. "Michael Blakely <hello@michaeldblakely.com>").
-  const from = process.env.CONTACT_FROM ?? "Portfolio <onboarding@resend.dev>";
-  const to = process.env.CONTACT_TO ?? site.email;
-
   try {
-    const { error } = await resend.emails.send({
-      from,
-      to,
+    await sendMail({
+      to: inboxAddress(),
+      // From must be Michael's own address (Proton won't send as the visitor),
+      // so the visitor goes in replyTo — hitting Reply answers them directly.
       replyTo: email,
       subject: `Portfolio contact — ${name}`,
       text: `From: ${name} <${email}>\n\n${message}`,
     });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json(
-        { error: "Something went wrong sending your message." },
-        { status: 502 },
-      );
-    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Contact route error:", err);
     return NextResponse.json(
       { error: "Something went wrong sending your message." },
-      { status: 500 },
+      { status: 502 },
     );
   }
 }

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { site } from "@/lib/site";
 import { estimatedAnnualValue, getProduct } from "@/lib/shop";
+import { inboxAddress, mailerConfigured, sendMail } from "@/lib/mailer";
 
-// Node runtime (default) — Resend SDK needs Node, not the edge runtime.
+// SMTP needs raw TCP, which the edge runtime doesn't have. Must stay nodejs.
 export const runtime = "nodejs";
 
 type Payload = {
@@ -60,34 +60,24 @@ export async function POST(request: Request) {
     `LinkedIn: ${site.linkedin}\n` +
     `Portfolio: ${site.url}\n`;
 
-  // If Resend isn't configured, the on-page receipt is still the deliverable.
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
+  // If SMTP isn't configured, the on-page receipt is still the deliverable.
+  if (!mailerConfigured()) {
     return NextResponse.json({ ok: true, emailed: false });
   }
 
-  const resend = new Resend(apiKey);
-  const from = process.env.CONTACT_FROM ?? "Portfolio <onboarding@resend.dev>";
-
   try {
-    const { error } = await resend.emails.send({
-      from,
+    await sendMail({
       to: email,
       // BCC Michael so a "purchase" doubles as a warm lead.
-      bcc: process.env.CONTACT_TO ?? site.email,
+      bcc: inboxAddress(),
       replyTo: site.email,
       subject: `Your shortlist — the case for hiring ${site.name}`,
       text,
     });
 
-    if (error) {
-      console.error("Resend error (shop-order):", error);
-      // Non-fatal: the client still shows the receipt.
-      return NextResponse.json({ ok: true, emailed: false });
-    }
-
     return NextResponse.json({ ok: true, emailed: true });
   } catch (err) {
+    // Non-fatal: the client still shows and can download the receipt.
     console.error("Shop-order route error:", err);
     return NextResponse.json({ ok: true, emailed: false });
   }
