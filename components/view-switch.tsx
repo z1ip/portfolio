@@ -13,8 +13,11 @@ export function ViewSwitch() {
   const pathname = usePathname();
   const isFun = pathname.startsWith("/shop");
 
+  // Short labels until lg. In the store header this sits next to a wordmark, a
+  // search bar, a theme toggle and a cart — at 768px the full labels push that
+  // whole row past the viewport edge.
   const label =
-    "relative z-10 w-[7rem] rounded-full py-1.5 text-center font-mono text-[0.58rem] uppercase tracking-[0.1em] transition-colors sm:w-[7.5rem] sm:text-[0.6rem]";
+    "relative z-10 w-[4.75rem] rounded-full py-1.5 text-center font-mono text-[0.56rem] uppercase tracking-[0.08em] transition-colors lg:w-[7.5rem] lg:text-[0.6rem] lg:tracking-[0.1em]";
 
   return (
     <div
@@ -38,7 +41,8 @@ export function ViewSwitch() {
           !isFun ? "text-accent-ink" : "text-ink-soft hover:text-accent",
         )}
       >
-        Read as portfolio
+        <span className="lg:hidden">Portfolio</span>
+        <span className="hidden lg:inline">Read as portfolio</span>
       </Link>
       <Link
         href="/shop"
@@ -49,7 +53,8 @@ export function ViewSwitch() {
           isFun ? "text-accent-ink" : "text-ink-soft hover:text-accent",
         )}
       >
-        Fun version
+        <span className="lg:hidden">Shop</span>
+        <span className="hidden lg:inline">Fun version</span>
       </Link>
     </div>
   );

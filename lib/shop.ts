@@ -262,6 +262,40 @@ export function productsByDepartment(dept: Department): Product[] {
   return products.filter((p) => p.department === dept);
 }
 
+/** Sort orders offered in the results toolbar. */
+export type SortKey = "featured" | "rating" | "name" | "department";
+
+export const sortLabels: Record<SortKey, string> = {
+  featured: "Featured",
+  rating: "Avg. customer review",
+  name: "Name: A–Z",
+  department: "Department",
+};
+
+/**
+ * "Featured" is the hand-ordered sequence in `products` above — badged items
+ * first within it — which is how a real store merchandises a shelf.
+ */
+export function sortProducts(list: Product[], key: SortKey): Product[] {
+  const next = [...list];
+  switch (key) {
+    case "rating":
+      return next.sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
+    case "name":
+      return next.sort((a, b) => a.name.localeCompare(b.name));
+    case "department":
+      return next.sort(
+        (a, b) =>
+          departments.indexOf(a.department) - departments.indexOf(b.department) ||
+          a.name.localeCompare(b.name),
+      );
+    default:
+      return next.sort(
+        (a, b) => Number(Boolean(b.badge)) - Number(Boolean(a.badge)),
+      );
+  }
+}
+
 /** Sum the dollar-valued products in a set of ids — the cart's headline number. */
 export function estimatedAnnualValue(ids: string[]): number {
   return ids.reduce((sum, id) => sum + (getProduct(id)?.valueUsd ?? 0), 0);

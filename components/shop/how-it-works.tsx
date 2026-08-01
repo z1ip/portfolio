@@ -53,7 +53,7 @@ export function HowItWorks() {
   return (
     <section
       aria-label="How this store works"
-      className="relative mb-10 border border-hairline bg-paper-dim p-6 sm:mb-12 sm:p-8"
+      className="relative mb-7 border border-hairline bg-paper-dim p-5 sm:mb-9 sm:p-7"
     >
       <button
         type="button"

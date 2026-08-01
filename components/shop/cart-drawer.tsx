@@ -110,7 +110,7 @@ export function CartDrawer() {
               ))}
             </ul>
 
-            <div className="border-t border-hairline px-6 py-5">
+            <div className="border-t border-hairline px-6 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
               {value > 0 && (
                 <div className="mb-4 flex items-baseline justify-between">
                   <span className="font-mono text-[0.68rem] uppercase tracking-[0.14em] text-muted">

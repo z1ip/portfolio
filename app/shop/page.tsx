@@ -8,9 +8,11 @@ export default function ShopHome() {
   return (
     <>
       <ShopBanner />
-      <section className="py-10 sm:py-12">
+      <section className="py-7 sm:py-10">
         <Container>
           <HowItWorks />
+          {/* ShopBrowser reads the filters out of the URL, so it needs a
+              boundary or the whole route opts out of static rendering. */}
           <Suspense>
             <ShopBrowser />
           </Suspense>
