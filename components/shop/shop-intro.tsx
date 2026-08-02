@@ -157,10 +157,14 @@ export function ShopIntro() {
                 looks the same, and I&apos;d rather be the one you remember.
               </p>
               <p>
-                The second is that this <em>is</em> the job. I&apos;ve spent
-                seven years running listings, orders, and fulfillment across
-                five marketplaces — so if I&apos;m going to stand out, it may as
-                well be by doing the thing I&apos;m actually good at.
+                {/* Explicit {" "} around the <em>: the plain source space after
+                    </em> was dropped in the build and shipped as "isthe job". */}
+                The second is that this{" "}
+                <em>is</em>{" "}
+                the job. I&apos;ve spent seven years running listings, orders,
+                and fulfillment across five marketplaces — so if I&apos;m going
+                to stand out, it may as well be by doing the thing I&apos;m
+                actually good at.
               </p>
               <p className="text-ink">
                 Everything in here is true. The numbers, the tools, the results.
