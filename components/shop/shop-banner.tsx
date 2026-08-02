@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/container";
 import { HireAllButton } from "./hire-all-button";
+import { ShopIntro } from "./shop-intro";
 
 /** Storefront header: avatar, shop name, seller stats, and a contact CTA. */
 export function ShopBanner() {
@@ -72,6 +73,9 @@ export function ShopBanner() {
             </Link>{" "}
             says the same things in full sentences.
           </p>
+          {/* Renders the one-time intro dialog, and the link back to it once
+              the visitor has dismissed it. */}
+          <ShopIntro />
         </div>
       </Container>
     </section>
